@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Communication Board</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 10px;
+            user-select: none;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .categories {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .category-btn {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+
+        .category-btn:hover {
+            background: #1976D2;
+        }
+
+        .category-btn.active {
+            background: #1976D2;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .board-item {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .board-item:hover {
+            transform: scale(1.05);
+            border-color: #2196F3;
+            box-shadow: 0 4px 16px rgba(33, 150, 243, 0.3);
+        }
+
+        .board-item:active {
+            transform: scale(0.95);
+        }
+
+        .board-item.selected {
+            background: #E3F2FD;
+            border-color: #2196F3;
+            border-width: 3px;
+        }
+
+        .icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+
+        .text {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .message-display {
+            background: white;
+            border: 2px solid #2196F3;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .message-content {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .message-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #1976D2;
+        }
+
+        .action-btn.speak {
+            background: #4CAF50;
+        }
+
+        .action-btn.speak:hover {
+            background: #45a049;
+        }
+
+        .action-btn.clear {
+            background: #f44336;
+        }
+
+        .action-btn.clear:hover {
+            background: #da190b;
+        }
+
+        .action-btn.backspace {
+            background: #FF9800;
+        }
+
+        .action-btn.backspace:hover {
+            background: #F57C00;
+        }
+
+        .spelled-word {
+            background: #FFF3E0;
+            border: 2px solid #FF9800;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            letter-spacing: 2px;
+        }
+
+        .alphabet-board {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .alphabet-item {
+            background: #E8F5E8;
+            border: 2px solid #4CAF50;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #2E7D32;
+        }
+
+        .alphabet-item:hover {
+            transform: scale(1.1);
+            background: #C8E6C9;
+            border-color: #388E3C;
+        }
+
+        .alphabet-item:active {
+            transform: scale(0.95);
+        }
+
+        @media (max-width: 768px) {
+            .board {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                gap: 10px;
+            }
+            
+            .board-item {
+                min-height: 100px;
+                padding: 10px;
+            }
+            
+            .icon {
+                font-size: 32px;
+            }
+            
+            .text {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Melissa's Communication Board</h1>
+    </div>
+
+    <div class="message-display">
+        <div class="message-content" id="messageContent">Select items to communicate...</div>
+        <div class="message-actions">
+            <button class="action-btn speak" onclick="speakMessage()">🔊 Speak</button>
+            <button class="action-btn clear" onclick="clearMessage()">Clear</button>
+        </div>
+    </div>
+
+    <!-- Spelling section - only visible when alphabet category is active -->
+    <div id="spellingSection" style="display: none;">
+        <div class="spelled-word" id="spelledWord"></div>
+        <div style="text-align: center; margin-bottom: 15px;">
+            <button class="action-btn backspace" onclick="backspaceLetter()">⌫ Backspace</button>
+            <button class="action-btn speak" onclick="speakSpelledWord()">🔊 Speak Word</button>
+            <button class="action-btn clear" onclick="clearSpelling()">Clear Word</button>
+        </div>
+    </div>
+
+    <div class="categories">
+        <button class="category-btn active" onclick="showCategory('all')">All</button>
+        <button class="category-btn" onclick="showCategory('basic')">Basic</button>
+        <button class="category-btn" onclick="showCategory('comfort')">Comfort</button>
+        <button class="category-btn" onclick="showCategory('medical')">Medical</button>
+        <button class="category-btn" onclick="showCategory('emotions')">Emotions</button>
+        <button class="category-btn" onclick="showCategory('activities')">Activities</button>
+        <button class="category-btn" onclick="showCategory('alphabet')">Alphabet</button>
+    </div>
+
+    <div class="board" id="board">
+        <!-- Items will be populated by JavaScript -->
+    </div>
+
+    <script>
+        // Communication board data
+        const boardData = {
+            basic: [
+                { icon: '✅', text: 'Yes', message: 'Yes' },
+                { icon: '❌', text: 'No', message: 'No' },
+                { icon: '🙏', text: 'Please', message: 'Please' },
+                { icon: '💝', text: 'Thank you', message: 'Thank you' },
+                { icon: '💧', text: 'Water', message: 'I need water' },
+                { icon: '🍽️', text: 'Hungry', message: 'I am hungry' },
+                { icon: '🚽', text: 'Bathroom', message: 'I need to use the bathroom' },
+                { icon: '😴', text: 'Tired', message: 'I am tired' },
+                { icon: '🔥', text: 'Hot', message: 'I am hot' },
+                { icon: '🥶', text: 'Cold', message: 'I am cold' }
+            ],
+            comfort: [
+                { icon: '🛏️', text: 'Adjust bed', message: 'Please adjust my bed' },
+                { icon: '🛏️', text: 'Pillows', message: 'I need pillow adjustment' },
+                { icon: '🦶', text: 'Cover feet', message: 'Please cover my feet' },
+                { icon: '🧴', text: 'Lip balm', message: 'I need lip balm' },
+                { icon: '🧤', text: 'Warm blanket', message: 'I need a warm blanket' },
+                { icon: '💆', text: 'Massage', message: 'I would like a massage' },
+                { icon: '💡', text: 'Adjust lights', message: 'Please adjust the lights' },
+                { icon: '🪟', text: 'Adjust blinds', message: 'Please adjust the blinds' },
+                { icon: '📱', text: 'Phone', message: 'I want my phone' },
+                { icon: '👓', text: 'Glasses', message: 'I need my glasses' }
+            ],
+            medical: [
+                { icon: '😣', text: 'Pain', message: 'I am in pain' },
+                { icon: '💊', text: 'Medication', message: 'I need my medication' },
+                { icon: '👩‍⚕️', text: 'Call nurse', message: 'Please call the nurse' },
+                { icon: '👨‍⚕️', text: 'Call doctor', message: 'Please call the doctor' },
+                { icon: '🫁', text: 'Breathing', message: 'I am having trouble breathing' },
+                { icon: '🤢', text: 'Nausea', message: 'I feel nauseous' },
+                { icon: '🧽', text: 'Suction', message: 'I need suctioning' },
+                { icon: '🩺', text: 'Check vitals', message: 'Please check my vitals' },
+                { icon: '💉', text: 'Injection', message: 'I need an injection' },
+                { icon: '🌡️', text: 'Temperature', message: 'Please check my temperature' }
+            ],
+            emotions: [
+                { icon: '😊', text: 'Happy', message: 'I am happy' },
+                { icon: '😢', text: 'Sad', message: 'I am sad' },
+                { icon: '😰', text: 'Worried', message: 'I am worried' },
+                { icon: '😤', text: 'Frustrated', message: 'I am frustrated' },
+                { icon: '😴', text: 'Sleepy', message: 'I am sleepy' },
+                { icon: '😵', text: 'Dizzy', message: 'I feel dizzy' },
+                { icon: '❤️', text: 'Love you', message: 'I love you' },
+                { icon: '🤗', text: 'Hug', message: 'I want a hug' },
+                { icon: '👨‍👩‍👧‍👦', text: 'Family', message: 'I want to see my family' },
+                { icon: '🙏', text: 'Pray', message: 'I want to pray' }
+            ],
+            activities: [
+                { icon: '📺', text: 'TV', message: 'I want to watch TV' },
+                { icon: '🎵', text: 'Music', message: 'I want to listen to music' },
+                { icon: '📖', text: 'Read', message: 'I want to read' },
+                { icon: '🔊', text: 'Volume up', message: 'Please turn the volume up' },
+                { icon: '🔉', text: 'Volume down', message: 'Please turn the volume down' },
+                { icon: '📞', text: 'Call someone', message: 'I want to call someone' },
+                { icon: '✍️', text: 'Write', message: 'I want to write something' },
+                { icon: '🪟', text: 'Window', message: 'Please open/close the window' },
+                { icon: '🚪', text: 'Door', message: 'Please open/close the door' },
+                { icon: '🕐', text: 'Time', message: 'What time is it?' }
+            ],
+            alphabet: [
+                { letter: 'A' }, { letter: 'B' }, { letter: 'C' }, { letter: 'D' }, { letter: 'E' }, { letter: 'F' },
+                { letter: 'G' }, { letter: 'H' }, { letter: 'I' }, { letter: 'J' }, { letter: 'K' }, { letter: 'L' },
+                { letter: 'M' }, { letter: 'N' }, { letter: 'O' }, { letter: 'P' }, { letter: 'Q' }, { letter: 'R' },
+                { letter: 'S' }, { letter: 'T' }, { letter: 'U' }, { letter: 'V' }, { letter: 'W' }, { letter: 'X' },
+                { letter: 'Y' }, { letter: 'Z' }, { letter: 'SPACE' }
+            ]
+        };
+
+        let selectedMessage = '';
+        let currentCategory = 'all';
+        let spelledWord = '';
+
+        function getAllItems() {
+            const allItems = [];
+            for (const category in boardData) {
+                // Skip alphabet category in "All" view since it has different structure
+                if (category !== 'alphabet') {
+                    allItems.push(...boardData[category]);
+                }
+            }
+            return allItems;
+        }
+
+        function showCategory(category) {
+            currentCategory = category;
+            
+            // Update active button
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Show/hide spelling section
+            const spellingSection = document.getElementById('spellingSection');
+            const messageDisplay = document.querySelector('.message-display');
+            
+            if (category === 'alphabet') {
+                spellingSection.style.display = 'block';
+                messageDisplay.style.display = 'none';
+                displayAlphabet();
+            } else {
+                spellingSection.style.display = 'none';
+                messageDisplay.style.display = 'flex';
+                const items = category === 'all' ? getAllItems() : boardData[category];
+                displayItems(items);
+            }
+        }
+
+        function displayItems(items) {
+            const board = document.getElementById('board');
+            board.innerHTML = '';
+            board.className = 'board'; // Reset to normal board layout
+            
+            items.forEach(item => {
+                const boardItem = document.createElement('div');
+                boardItem.className = 'board-item';
+                boardItem.onclick = () => selectItem(item, boardItem);
+                
+                boardItem.innerHTML = `
+                    <div class="icon">${item.icon}</div>
+                    <div class="text">${item.text}</div>
+                `;
+                
+                board.appendChild(boardItem);
+            });
+        }
+
+        function selectItem(item, element) {
+            // Remove previous selection
+            document.querySelectorAll('.board-item').forEach(el => {
+                el.classList.remove('selected');
+            });
+            
+            // Add selection to current item
+            element.classList.add('selected');
+            
+            // Update message
+            selectedMessage = item.message;
+            document.getElementById('messageContent').textContent = selectedMessage;
+            
+            // Auto-speak if Web Speech API is available
+            if ('speechSynthesis' in window) {
+                setTimeout(() => speakMessage(), 200);
+            }
+        }
+
+        function speakMessage() {
+            if (selectedMessage && 'speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(selectedMessage);
+                utterance.rate = 0.8;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        function clearMessage() {
+            selectedMessage = '';
+            document.getElementById('messageContent').textContent = 'Select items to communicate...';
+            document.querySelectorAll('.board-item').forEach(el => {
+                el.classList.remove('selected');
+            });
+        }
+
+        function displayAlphabet() {
+            const board = document.getElementById('board');
+            board.innerHTML = '';
+            board.className = 'alphabet-board';
+            
+            boardData.alphabet.forEach(item => {
+                const alphabetItem = document.createElement('div');
+                alphabetItem.className = 'alphabet-item';
+                alphabetItem.onclick = () => addLetter(item.letter);
+                alphabetItem.textContent = item.letter === 'SPACE' ? '␣' : item.letter;
+                board.appendChild(alphabetItem);
+            });
+        }
+
+        function addLetter(letter) {
+            if (letter === 'SPACE') {
+                spelledWord += ' ';
+            } else {
+                spelledWord += letter;
+            }
+            updateSpelledWord();
+        }
+
+        function updateSpelledWord() {
+            const spelledWordElement = document.getElementById('spelledWord');
+            spelledWordElement.textContent = spelledWord || 'Start spelling...';
+        }
+
+        function backspaceLetter() {
+            if (spelledWord.length > 0) {
+                spelledWord = spelledWord.slice(0, -1);
+                updateSpelledWord();
+            }
+        }
+
+        function speakSpelledWord() {
+            if (spelledWord && 'speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(spelledWord);
+                utterance.rate = 0.8;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        function clearSpelling() {
+            spelledWord = '';
+            updateSpelledWord();
+        }
+
+        // Initialize the board
+        displayItems(getAllItems());
+    </script>
+</body>
+</html>
